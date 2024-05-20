@@ -1,14 +1,13 @@
-import streamlit as st
-import json
-import numpy as np
 import base64
 import io
-from streamlit_drawable_canvas import st_canvas
-from PIL import Image, ImageDraw
-import fitz
-from ocr import load_model, inference
-import pandas as pd
+import json
 import os
+
+import fitz
+import pandas as pd
+import streamlit as st
+
+from ocr import load_model, inference
 from streamlit_img_label import st_img_label
 from streamlit_img_label.manage import ImageManager, ImageDirManager
 
@@ -36,7 +35,6 @@ def previous_page():
 
 
 def run(img_dir, engine):
-
     pdf_data = None
     n_max_page = 0
     idm = ImageDirManager(img_dir)
@@ -47,7 +45,7 @@ def run(img_dir, engine):
     else:
         idm.set_all_files(st.session_state["files"])
 
-    st.sidebar.title("**Plato - OCR Web App 👁️**")
+    st.sidebar.title("**OCR Web App️lication**")
     st.sidebar.subheader("**Template Option**")
     options = ["Manual labelling", "Auto-extraction"]
     selected_option = st.sidebar.radio("Select an option:", options)
@@ -61,10 +59,6 @@ def run(img_dir, engine):
         selected_template = st.sidebar.selectbox(
             "Select the template:", list(template_dict.keys())
         )
-
-
-
-
 
     def reset_page_number():
         st.session_state.page_number = 0
@@ -93,11 +87,11 @@ def run(img_dir, engine):
         st.session_state["files"] = idm.get_all_files()
 
     if st.sidebar.selectbox(
-        "Files",
-        st.session_state["files"],
-        index=st.session_state["image_index"],
-        on_change=go_to_image,
-        key="file",
+            "Files",
+            st.session_state["files"],
+            index=st.session_state["image_index"],
+            on_change=go_to_image,
+            key="file",
     ):
         img_file_name = idm.get_image(st.session_state["image_index"])
 
@@ -123,7 +117,6 @@ def run(img_dir, engine):
             st.session_state["image_index"] -= 1
         else:
             st.warning("This is the first image.")
-
 
     def annotate():
         im.save_annotation()
@@ -233,12 +226,12 @@ def run(img_dir, engine):
                         }
                     ]
 
-                    predict_df = inference(data_input, engine)  # ocr image
+                    predict_df = inference(data_input, engine)
                     current_df = st.data_editor(
                         predict_df, num_rows="dynamic", key=f"dataframe{i}"
                     )  # editable dataframe
                     df_ls[i] = current_df
-                
+
                 if selected_option == "Auto-extraction":
                     box_type = template_dict[selected_template][i]["type"]
                     if box_type == "table" or box_type == "both":
@@ -266,7 +259,6 @@ def run(img_dir, engine):
                         )  # editable dataframe
                         df_ls[i] = current_df
 
-        # button to concatenate dataframe
         if st.button(label="Concatenate Dataframes"):
             # if there are no dataframes
             if len(df_ls) == 0:
@@ -338,14 +330,16 @@ def run(img_dir, engine):
 
 
 if __name__ == "__main__":
-    st.set_page_config(page_title="The Ramsey Highlights", layout="wide")
+    st.set_page_config(page_title="SceneText - OCR", layout="wide")
     directory_name = "data_dir"
     os.makedirs(directory_name, exist_ok=True)
+
 
     @st.cache_resource()
     def get_model():
         table_engine = load_model()
         return table_engine
+
 
     table_engine = get_model()
     run(img_dir=directory_name, engine=table_engine)
