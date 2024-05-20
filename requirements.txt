@@ -1,0 +1,8 @@
+torch
+transformers
+streamlit_drawable_canvas
+pymupdf
+paddlepaddle
+paddleocr
+deskew
+scikit-image
