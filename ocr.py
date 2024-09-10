@@ -5,19 +5,6 @@ from tablepyxl import tablepyxl
 from copy import deepcopy
 import io
 import numpy as np
-# from deskew import determine_skew
-# from skimage.transform import rotate
-
-# def strighten_image(img):
-#     """
-#     img: np.array
-
-#     rotate image to strighten
-#     """
-#     angle = determine_skew(img)
-#     rotated = rotate(img, angle, resize=True) * 255
-#     rotated_img = rotated.astype(np.uint8)
-#     return rotated_img, angle
 
 def load_model():
     """
@@ -57,9 +44,7 @@ def process_result(result):
     result_cp = deepcopy(result)
     df_ls = []
     for region in result_cp:
-        # if html are available
         if 'html' in region['res']:
-            # try to convert html to dataframe with tablepyxl
             try:
                 html = region['res']['html']
                 wb = tablepyxl.document_to_workbook(html)
@@ -69,7 +54,6 @@ def process_result(result):
                 df = pd.read_excel(output, header=None)
                 df = df.dropna(how='all').dropna(axis=1, how='all')
                 df_ls.append(df)
-            # if tablepyxl give error, try to convert html to dataframe with pandas
             except:
                 try:
                     df = pd.read_html(result[0]['res']['html'])[0]
@@ -79,11 +63,9 @@ def process_result(result):
                     df = pd.DataFrame()
                     df_ls.append(df)
         else:
-            # empty dataframe
             df = pd.DataFrame()
             df_ls.append(df)
             
-    # concat dataframe if there are more than 1 dataframe  
     if len(df_ls) == 0:
         return pd.DataFrame()
     else:    
